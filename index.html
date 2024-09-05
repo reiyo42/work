@@ -9,6 +9,9 @@
             font-family: Arial, sans-serif;
             margin: 20px;
         }
+        .input-group {
+            margin: 5px 0;
+        }
         input, button {
             margin: 5px;
         }
@@ -17,8 +20,10 @@
 <body>
     <h1>Graph Plotter</h1>
     <form id="dataForm">
-        <label for="values">Enter values (comma separated):</label>
-        <input type="text" id="values" placeholder="e.g. 10, 20, 30, 40">
+        <div id="inputsContainer">
+            <!-- 数値入力欄が動的に追加されます -->
+        </div>
+        <button type="button" id="addInputButton">Add Input</button>
         <button type="submit">Draw Graph</button>
     </form>
     <button id="generateUrlButton">Generate URL</button>
@@ -29,11 +34,33 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
         let currentData = [];
+        let inputCount = 0;
 
+        // 新しい入力欄を追加する関数
+        function addInputField() {
+            inputCount++;
+            const container = document.getElementById('inputsContainer');
+            const inputGroup = document.createElement('div');
+            inputGroup.classList.add('input-group');
+            inputGroup.innerHTML = `
+                <label for="value${inputCount}">Value ${inputCount}:</label>
+                <input type="number" id="value${inputCount}" placeholder="Enter a number">
+            `;
+            container.appendChild(inputGroup);
+        }
+
+        // 初期に1つの入力欄を追加
+        addInputField();
+
+        // 「Add Input」ボタンのクリックイベント
+        document.getElementById('addInputButton').addEventListener('click', function() {
+            addInputField();
+        });
+
+        // フォームの送信イベント
         document.getElementById('dataForm').addEventListener('submit', function(event) {
             event.preventDefault();
-            const input = document.getElementById('values').value;
-            currentData = input.split(',').map(Number);
+            currentData = Array.from(document.querySelectorAll('#inputsContainer input')).map(input => Number(input.value)).filter(value => !isNaN(value));
 
             const ctx = document.getElementById('myChart').getContext('2d');
             new Chart(ctx, {
@@ -61,6 +88,7 @@
             });
         });
 
+        // 「Generate URL」ボタンのクリックイベント
         document.getElementById('generateUrlButton').addEventListener('click', function() {
             const params = new URLSearchParams();
             params.append('data', currentData.join(','));
