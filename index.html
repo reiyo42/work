@@ -17,6 +17,9 @@
         input, button {
             margin: 5px;
         }
+        .copy-button {
+            margin-top: 10px;
+        }
     </style>
 </head>
 <body>
@@ -29,6 +32,7 @@
         <button type="submit">グラフを描画</button>
     </form>
     <button id="generateUrlButton">URLを生成</button>
+    <button id="copyDataButton" class="copy-button">データをコピー</button>
     <p id="generatedUrl"></p>
     <canvas id="myChart"></canvas>
 
@@ -45,8 +49,8 @@
             const inputGroup = document.createElement('div');
             inputGroup.classList.add('input-group');
             inputGroup.innerHTML = `
-                <label for="value${inputCount}">値 ${inputCount}:</label>
-                <input type="number" id="value${inputCount}" placeholder="数値を入力">
+                <label for="value${inputCount}">金額 ${inputCount}:</label>
+                <input type="number" id="value${inputCount}" placeholder="金額を入力">
                 <button type="button" class="removeButton">削除</button>
             `;
             container.appendChild(inputGroup);
@@ -65,30 +69,24 @@
                 const input = group.querySelector('input');
                 input.id = `value${index + 1}`;
                 group.querySelector('label').setAttribute('for', `value${index + 1}`);
-                group.querySelector('label').innerText = `値 ${index + 1}:`;
+                group.querySelector('label').innerText = `金額 ${index + 1}:`;
             });
         }
 
-        // 初期に1つの入力欄を追加
-        addInputField();
+        // 数値を日本円フォーマットで表示する関数
+        function formatYen(value) {
+            return `¥${value.toLocaleString()}`;
+        }
 
-        // 「入力欄を追加」ボタンのクリックイベント
-        document.getElementById('addInputButton').addEventListener('click', function() {
-            addInputField();
-        });
-
-        // フォームの送信イベント
-        document.getElementById('dataForm').addEventListener('submit', function(event) {
-            event.preventDefault();
-            currentData = Array.from(document.querySelectorAll('#inputsContainer input')).map(input => Number(input.value)).filter(value => !isNaN(value));
-
+        // グラフを描画する関数
+        function drawChart() {
             const ctx = document.getElementById('myChart').getContext('2d');
             new Chart(ctx, {
                 type: 'bar',
                 data: {
                     labels: currentData.map((_, index) => `ポイント ${index + 1}`),
                     datasets: [{
-                        label: 'データ',
+                        label: '金額',
                         data: currentData,
                         backgroundColor: 'rgba(75, 192, 192, 0.2)',
                         borderColor: 'rgba(75, 192, 192, 1)',
@@ -109,11 +107,24 @@
                             title: {
                                 display: true,
                                 text: 'Y 軸'
+                            },
+                            ticks: {
+                                callback: function(value) {
+                                    return formatYen(value);
+                                }
                             }
                         }
                     }
                 }
             });
+        }
+
+        // フォームの送信イベント
+        document.getElementById('dataForm').addEventListener('submit', function(event) {
+            event.preventDefault();
+            currentData = Array.from(document.querySelectorAll('#inputsContainer input')).map(input => Number(input.value)).filter(value => !isNaN(value));
+
+            drawChart();
         });
 
         // 「URLを生成」ボタンのクリックイベント
@@ -125,6 +136,14 @@
             const fullUrl = `${baseUrl}?${params.toString()}`;
             
             document.getElementById('generatedUrl').innerText = fullUrl;
+        });
+
+        // 「データをコピー」ボタンのクリックイベント
+        document.getElementById('copyDataButton').addEventListener('click', function() {
+            const dataString = currentData.map(value => formatYen(value)).join('\t');
+            navigator.clipboard.writeText(dataString).then(() => {
+                alert('データがクリップボードにコピーされました。');
+            });
         });
     </script>
 </body>
