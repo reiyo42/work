@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ja">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Graph Plotter</title>
+    <title>グラフプロッター</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -11,6 +11,8 @@
         }
         .input-group {
             margin: 5px 0;
+            display: flex;
+            align-items: center;
         }
         input, button {
             margin: 5px;
@@ -18,19 +20,19 @@
     </style>
 </head>
 <body>
-    <h1>Graph Plotter</h1>
+    <h1>グラフプロッター</h1>
     <form id="dataForm">
         <div id="inputsContainer">
             <!-- 数値入力欄が動的に追加されます -->
         </div>
-        <button type="button" id="addInputButton">Add Input</button>
-        <button type="submit">Draw Graph</button>
+        <button type="button" id="addInputButton">入力欄を追加</button>
+        <button type="submit">グラフを描画</button>
     </form>
-    <button id="generateUrlButton">Generate URL</button>
+    <button id="generateUrlButton">URLを生成</button>
     <p id="generatedUrl"></p>
     <canvas id="myChart"></canvas>
 
-    <!-- Include Chart.js -->
+    <!-- Chart.jsを読み込む -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
         let currentData = [];
@@ -43,16 +45,34 @@
             const inputGroup = document.createElement('div');
             inputGroup.classList.add('input-group');
             inputGroup.innerHTML = `
-                <label for="value${inputCount}">Value ${inputCount}:</label>
-                <input type="number" id="value${inputCount}" placeholder="Enter a number">
+                <label for="value${inputCount}">値 ${inputCount}:</label>
+                <input type="number" id="value${inputCount}" placeholder="数値を入力">
+                <button type="button" class="removeButton">削除</button>
             `;
             container.appendChild(inputGroup);
+
+            // 削除ボタンのクリックイベント
+            inputGroup.querySelector('.removeButton').addEventListener('click', function() {
+                container.removeChild(inputGroup);
+                updateInputCount();
+            });
+        }
+
+        // 入力欄のカウントを更新する関数
+        function updateInputCount() {
+            inputCount = document.querySelectorAll('#inputsContainer .input-group').length;
+            document.querySelectorAll('#inputsContainer .input-group').forEach((group, index) => {
+                const input = group.querySelector('input');
+                input.id = `value${index + 1}`;
+                group.querySelector('label').setAttribute('for', `value${index + 1}`);
+                group.querySelector('label').innerText = `値 ${index + 1}:`;
+            });
         }
 
         // 初期に1つの入力欄を追加
         addInputField();
 
-        // 「Add Input」ボタンのクリックイベント
+        // 「入力欄を追加」ボタンのクリックイベント
         document.getElementById('addInputButton').addEventListener('click', function() {
             addInputField();
         });
@@ -66,9 +86,9 @@
             new Chart(ctx, {
                 type: 'bar',
                 data: {
-                    labels: currentData.map((_, index) => `構成 ${index + 1}`),
+                    labels: currentData.map((_, index) => `ポイント ${index + 1}`),
                     datasets: [{
-                        label: 'Data',
+                        label: 'データ',
                         data: currentData,
                         backgroundColor: 'rgba(75, 192, 192, 0.2)',
                         borderColor: 'rgba(75, 192, 192, 1)',
@@ -78,17 +98,25 @@
                 options: {
                     scales: {
                         x: {
-                            beginAtZero: true
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: 'X 軸'
+                            }
                         },
                         y: {
-                            beginAtZero: true
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: 'Y 軸'
+                            }
                         }
                     }
                 }
             });
         });
 
-        // 「Generate URL」ボタンのクリックイベント
+        // 「URLを生成」ボタンのクリックイベント
         document.getElementById('generateUrlButton').addEventListener('click', function() {
             const params = new URLSearchParams();
             params.append('data', currentData.join(','));
