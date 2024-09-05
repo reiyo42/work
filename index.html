@@ -21,24 +21,28 @@
         <input type="text" id="values" placeholder="e.g. 10, 20, 30, 40">
         <button type="submit">Draw Graph</button>
     </form>
+    <button id="generateUrlButton">Generate URL</button>
+    <p id="generatedUrl"></p>
     <canvas id="myChart"></canvas>
 
     <!-- Include Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
+        let currentData = [];
+
         document.getElementById('dataForm').addEventListener('submit', function(event) {
             event.preventDefault();
             const input = document.getElementById('values').value;
-            const values = input.split(',').map(Number);
+            currentData = input.split(',').map(Number);
 
             const ctx = document.getElementById('myChart').getContext('2d');
             new Chart(ctx, {
-                type: 'bar', // 棒グラフに変更
+                type: 'bar',
                 data: {
-                    labels: values.map((_, index) => `Point ${index + 1}`),
+                    labels: currentData.map((_, index) => `Point ${index + 1}`),
                     datasets: [{
                         label: 'Data',
-                        data: values,
+                        data: currentData,
                         backgroundColor: 'rgba(75, 192, 192, 0.2)',
                         borderColor: 'rgba(75, 192, 192, 1)',
                         borderWidth: 1
@@ -55,6 +59,16 @@
                     }
                 }
             });
+        });
+
+        document.getElementById('generateUrlButton').addEventListener('click', function() {
+            const params = new URLSearchParams();
+            params.append('data', currentData.join(','));
+
+            const baseUrl = window.location.href.split('?')[0];
+            const fullUrl = `${baseUrl}?${params.toString()}`;
+            
+            document.getElementById('generatedUrl').innerText = fullUrl;
         });
     </script>
 </body>
