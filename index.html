@@ -64,8 +64,9 @@
 
         // 入力欄のカウントを更新する関数
         function updateInputCount() {
-            inputCount = document.querySelectorAll('#inputsContainer .input-group').length;
-            document.querySelectorAll('#inputsContainer .input-group').forEach((group, index) => {
+            const inputGroups = document.querySelectorAll('#inputsContainer .input-group');
+            inputCount = inputGroups.length;
+            inputGroups.forEach((group, index) => {
                 const input = group.querySelector('input');
                 input.id = `value${index + 1}`;
                 group.querySelector('label').setAttribute('for', `value${index + 1}`);
