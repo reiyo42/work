@@ -150,7 +150,9 @@
 
         // 「データをコピー」ボタンのクリックイベント
         document.getElementById('copyDataButton').addEventListener('click', function() {
-            const dataString = currentData.map(value => formatYen(value)).join('\t');
+            const headers = '項目,金額\n';
+            const dataRows = currentData.map((value, index) => `ポイント ${index + 1},${formatYen(value)}`).join('\n');
+            const dataString = headers + dataRows;
             navigator.clipboard.writeText(dataString).then(() => {
                 alert('データがクリップボードにコピーされました。');
             });
