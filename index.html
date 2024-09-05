@@ -74,6 +74,11 @@
             });
         }
 
+        // 初期に1つの入力欄を追加
+        document.addEventListener('DOMContentLoaded', () => {
+            addInputField(); // ページが読み込まれたら初期の入力欄を追加
+        });
+
         // 数値を日本円フォーマットで表示する関数
         function formatYen(value) {
             return `¥${value.toLocaleString()}`;
@@ -145,6 +150,11 @@
             navigator.clipboard.writeText(dataString).then(() => {
                 alert('データがクリップボードにコピーされました。');
             });
+        });
+
+        // 「入力欄を追加」ボタンのクリックイベント
+        document.getElementById('addInputButton').addEventListener('click', function() {
+            addInputField();
         });
     </script>
 </body>
