@@ -29,7 +29,7 @@
             <!-- 数値入力欄が動的に追加されます -->
         </div>
         <button type="button" id="addInputButton">入力欄を追加</button>
-        <button type="submit">グラフを描画</button>
+        <button type="submit" id="drawChartButton">グラフを描画</button>
     </form>
     <button id="generateUrlButton">URLを生成</button>
     <button id="copyDataButton" class="copy-button">データをコピー</button>
@@ -41,6 +41,7 @@
     <script>
         let currentData = [];
         let inputCount = 0;
+        let chart = null;
 
         // 新しい入力欄を追加する関数
         function addInputField() {
@@ -87,7 +88,10 @@
         // グラフを描画する関数
         function drawChart() {
             const ctx = document.getElementById('myChart').getContext('2d');
-            new Chart(ctx, {
+            if (chart) {
+                chart.destroy(); // 既存のグラフを破棄
+            }
+            chart = new Chart(ctx, {
                 type: 'bar',
                 data: {
                     labels: currentData.map((_, index) => `ポイント ${index + 1}`),
